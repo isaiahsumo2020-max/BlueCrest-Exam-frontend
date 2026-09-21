@@ -6,6 +6,7 @@ const { login, navigate } = useAppStore()
 const tab = ref<'staff' | 'student'>('staff')
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const error = ref('')
 const loading = ref(false)
 
@@ -92,7 +93,12 @@ function quickLogin(nextEmail: string, nextPassword: string) {
           </div>
           <div>
             <label class="block text-navy-200 text-sm mb-2">Password</label>
-            <input v-model="password" type="password" placeholder="••••••••" required class="w-full bg-navy-900 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors" />
+            <div class="relative">
+              <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" required class="w-full bg-navy-900 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 pr-12 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors" />
+              <button type="button" :aria-label="showPassword ? 'Hide password' : 'Show password'" :title="showPassword ? 'Hide password' : 'Show password'" class="absolute inset-y-0 right-0 px-4 text-navy-400 hover:text-gold-400 transition-colors" @click="showPassword = !showPassword">
+                <span aria-hidden="true">👁</span>
+              </button>
+            </div>
           </div>
           <div v-if="error" class="bg-red-900/40 border border-red-700/50 text-red-300 text-sm px-4 py-3 rounded-lg">{{ error }}</div>
           <button type="submit" :disabled="loading" class="w-full bg-gold-400 hover:bg-gold-300 text-navy-950 font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 text-sm">

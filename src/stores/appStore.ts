@@ -66,7 +66,17 @@ function persistProgrammes(items: Programme[], previous: Programme[]) {
 function persistStudents(items: Student[], previous: Student[]) {
   const nextIds = new Set(items.map(item => item.id))
   previous.filter(item => !nextIds.has(item.id)).forEach(item => { void deleteStudentRequest(item.id).catch(() => undefined) })
-  items.forEach(item => { void saveStudentRequest({ id: item.id, studentId: item.studentId, rollNumber: item.rollNumber, name: item.name, email: item.email, accessCode: item.accessCode, phone: item.phone, programmeId: item.programmeId, currentSemester: item.currentSemester, sessionId: item.sessionId, status: item.status, enrolledAt: item.enrolledAt }).catch(() => undefined) })
+  items.forEach(item => {
+    void saveStudentRequest({ id: item.id, studentId: item.studentId, rollNumber: item.rollNumber, name: item.name, email: item.email, accessCode: item.accessCode, phone: item.phone, programmeId: item.programmeId, currentSemester: item.currentSemester, sessionId: item.sessionId, status: item.status, enrolledAt: item.enrolledAt }).then(response => {
+      const saved = response.data as Record<string, unknown>
+      if (!saved.student_id || !saved.roll_number) return
+      const current = state.students.find(student => student.id === item.id)
+      if (!current) return
+      current.studentId = String(saved.student_id)
+      current.rollNumber = String(saved.roll_number)
+      if (saved.access_code) current.accessCode = String(saved.access_code)
+    }).catch(() => undefined)
+  })
 }
 
 function persistSessions(items: AcademicSession[], previous: AcademicSession[]) {

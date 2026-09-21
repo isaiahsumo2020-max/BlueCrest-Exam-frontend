@@ -9,6 +9,7 @@ const { getStudentResult, subjects, navigate } = useAppStore()
 const email = ref('')
 const roll = ref('')
 const accessCode = ref('')
+const showAccessCode = ref(false)
 const loading = ref(false)
 const data = ref<ResultData | null>(null)
 const error = ref('')
@@ -45,7 +46,12 @@ const gradeScale = [
         <form class="flex flex-col sm:flex-row gap-3" @submit.prevent="handleSearch">
           <input v-model="email" type="email" required placeholder="Email ID" class="flex-1 bg-navy-800 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors" />
           <input v-model="roll" type="text" required placeholder="Roll Number" class="w-full sm:w-48 bg-navy-800 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors" />
-          <input v-model="accessCode" type="password" required placeholder="Access code" autocomplete="off" class="w-full sm:w-48 bg-navy-800 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors" />
+          <div class="relative w-full sm:w-48">
+            <input v-model="accessCode" :type="showAccessCode ? 'text' : 'password'" required placeholder="Access code" autocomplete="off" class="w-full bg-navy-800 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 pr-12 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors" />
+            <button type="button" :aria-label="showAccessCode ? 'Hide access code' : 'Show access code'" :title="showAccessCode ? 'Hide access code' : 'Show access code'" class="absolute inset-y-0 right-0 px-4 text-navy-400 hover:text-gold-400 transition-colors" @click="showAccessCode = !showAccessCode">
+              <span aria-hidden="true">👁</span>
+            </button>
+          </div>
           <button type="submit" :disabled="loading" class="bg-gold-400 hover:bg-gold-300 text-navy-950 font-semibold px-6 py-3 rounded-lg text-sm transition-colors disabled:opacity-60 whitespace-nowrap">{{ loading ? 'Searching…' : 'View Result' }}</button>
         </form>
         <div class="mt-4 border-t border-navy-800 pt-4 text-xs text-navy-500">Try <button class="underline hover:text-navy-300 font-mono" @click="email = 'mtkollie@student.bluecrest.edu.lr'; roll = 'CS-2401'">mtkollie@student.bluecrest.edu.lr / CS-2401</button> or <button class="underline hover:text-navy-300 font-mono" @click="email = 'fkamara@student.bluecrest.edu.lr'; roll = 'CS-2404'">fkamara@student.bluecrest.edu.lr / CS-2404</button></div>

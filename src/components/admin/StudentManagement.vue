@@ -11,7 +11,7 @@ const filtered = computed(() => { const query = search.value.toLowerCase(); retu
 function clearFilters() { search.value = ''; filterProg.value = ''; filterSession.value = ''; filterStatus.value = '' }
 function openAdd() { editing.value = null; form.value = { ...emptyForm, programmeId: programmes.value[0]?.id ?? '', sessionId: sessions.value[0]?.id ?? '' }; modal.value = true }
 function openEdit(student: Student) { editing.value = student.id; form.value = { studentId: student.studentId, rollNumber: student.rollNumber, name: student.name, email: student.email, phone: student.phone, programmeId: student.programmeId, currentSemester: student.currentSemester, sessionId: student.sessionId, status: student.status }; modal.value = true }
-function save() { if (!form.value.name || !form.value.email || !form.value.rollNumber) return; if (editing.value) setStudents(items => items.map(student => student.id === editing.value ? { ...student, ...form.value } : student)); else setStudents(items => [...items, { id: `st${Date.now()}`, ...form.value, enrolledAt: new Date().toISOString().split('T')[0] }]); modal.value = false }
+function save() { if (!form.value.name || !form.value.email || !form.value.programmeId || !form.value.sessionId) return; if (editing.value) setStudents(items => items.map(student => student.id === editing.value ? { ...student, ...form.value } : student)); else setStudents(items => [...items, { id: `st${Date.now()}`, ...form.value, enrolledAt: new Date().toISOString().split('T')[0] }]); modal.value = false }
 function remove(id: string) { if (window.confirm('Remove this student record?')) setStudents(items => items.filter(student => student.id !== id)) }
 </script>
 <template>
