@@ -13,7 +13,7 @@ import {
   type Message,
 } from '../types'
 import { computeCGPA, computeGPA, computeTotal, getGradeRule } from '../utils/calculations'
-import { clearApiToken, deleteProgrammeRequest, deleteSemesterRequest, deleteSessionRequest, deleteStudentRequest, deleteSubjectRequest, getEntity, loginRequest, processResultsRequest, saveMarksRequest, saveProgrammeRequest, saveResultRequest, saveSemesterRequest, saveSessionRequest, saveStudentRequest, saveSubjectRequest, saveUserRequest, updateResultStatusRequest, type ApiMark, type ApiUser } from '../services/api'
+import { clearApiToken, deleteAuditRequest, deleteProgrammeRequest, deleteSemesterRequest, deleteSessionRequest, deleteStudentRequest, deleteSubjectRequest, getEntity, loginRequest, processResultsRequest, saveMarksRequest, saveProgrammeRequest, saveResultRequest, saveSemesterRequest, saveSessionRequest, saveStudentRequest, saveSubjectRequest, saveUserRequest, updateResultStatusRequest, type ApiMark, type ApiUser } from '../services/api'
 
 type MarksEntryInput = Omit<MarksEntry, 'totalMarks' | 'percentage' | 'grade' | 'gradePoint' | 'status'>
 
@@ -66,17 +66,7 @@ function persistProgrammes(items: Programme[], previous: Programme[]) {
 function persistStudents(items: Student[], previous: Student[]) {
   const nextIds = new Set(items.map(item => item.id))
   previous.filter(item => !nextIds.has(item.id)).forEach(item => { void deleteStudentRequest(item.id).catch(() => undefined) })
-  items.forEach(item => {
-    void saveStudentRequest({ id: item.id, studentId: item.studentId, rollNumber: item.rollNumber, name: item.name, email: item.email, accessCode: item.accessCode, phone: item.phone, programmeId: item.programmeId, currentSemester: item.currentSemester, sessionId: item.sessionId, status: item.status, enrolledAt: item.enrolledAt }).then(response => {
-      const saved = response.data as Record<string, unknown>
-      if (!saved.student_id || !saved.roll_number) return
-      const current = state.students.find(student => student.id === item.id)
-      if (!current) return
-      current.studentId = String(saved.student_id)
-      current.rollNumber = String(saved.roll_number)
-      if (saved.access_code) current.accessCode = String(saved.access_code)
-    }).catch(() => undefined)
-  })
+  items.forEach(item => { void saveStudentRequest({ id: item.id, studentId: item.studentId, rollNumber: item.rollNumber, name: item.name, email: item.email, accessCode: item.accessCode, phone: item.phone, programmeId: item.programmeId, currentSemester: item.currentSemester, sessionId: item.sessionId, status: item.status, enrolledAt: item.enrolledAt }).catch(() => undefined) })
 }
 
 function persistSessions(items: AcademicSession[], previous: AcademicSession[]) {
@@ -138,6 +128,13 @@ function addAuditLog(action: string, entity: string, details: string) {
   state.auditLogs.unshift(auditLog)
   const localAudit = JSON.parse(localStorage.getItem(localAuditStorageKey) ?? '[]') as AuditLog[]
   localStorage.setItem(localAuditStorageKey, JSON.stringify([auditLog, ...localAudit]))
+}
+
+async function deleteAuditLog(id: string) {
+  await deleteAuditRequest(id)
+  replaceItems(state.auditLogs, items => items.filter(log => log.id !== id))
+  const localAudit = JSON.parse(localStorage.getItem(localAuditStorageKey) ?? '[]') as AuditLog[]
+  localStorage.setItem(localAuditStorageKey, JSON.stringify(localAudit.filter(log => log.id !== id)))
 }
 
 async function login(email: string, password: string) {
@@ -340,6 +337,7 @@ export function useAppStore() {
     approveResult,
     publishResult,
     addAuditLog,
+    deleteAuditLog,
     sendMessage,
     markMessageRead,
     getStudentResult,

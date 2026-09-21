@@ -66,6 +66,10 @@ export async function deleteStudentRequest(id: string) {
   return request<void>(`/students/${id}`, { method: 'DELETE' })
 }
 
+export async function deleteAuditRequest(id: string) {
+  return request<void>(`/audit/${id}`, { method: 'DELETE' })
+}
+
 export async function saveSessionRequest(session: unknown) { return request<{ data: Record<string, unknown> }>('/sessions', { method: 'POST', body: JSON.stringify(session) }) }
 export async function deleteSessionRequest(id: string) { return request<void>(`/sessions/${id}`, { method: 'DELETE' }) }
 export async function saveSemesterRequest(semester: unknown) { return request<{ data: Record<string, unknown> }>('/semesters', { method: 'POST', body: JSON.stringify(semester) }) }

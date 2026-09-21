@@ -12,9 +12,11 @@ const adminUsers = computed(() => users.value.filter(user => user.role === 'admi
 const modal = ref(false)
 const editing = ref<string | null>(null)
 const showUserPassword = ref(false)
+const protectedSuperAdminId = 'u1'
+const canEditUser = (user: User) => user.id !== protectedSuperAdminId || user.id === currentUser.value?.id
 const form = ref({ name: '', email: '', password: '', role: 'staff' as 'admin' | 'staff', permissions: ['marks_entry', 'view_students', 'reports'], status: 'active' as User['status'] })
 function openAdd() { editing.value = null; showUserPassword.value = false; form.value = { name: '', email: '', password: '', role: 'staff', permissions: ['marks_entry', 'view_students', 'reports'], status: 'active' }; modal.value = true }
-function openEdit(user: User) { editing.value = user.id; showUserPassword.value = false; form.value = { name: user.name, email: user.email, password: user.password, role: user.role, permissions: [...user.permissions], status: user.status }; modal.value = true }
+function openEdit(user: User) { if (!canEditUser(user)) return; editing.value = user.id; showUserPassword.value = false; form.value = { name: user.name, email: user.email, password: user.password, role: user.role, permissions: [...user.permissions], status: user.status }; modal.value = true }
 function save() { if (!form.value.name || !form.value.email) return; if (editing.value) { setUsers(items => items.map(user => user.id === editing.value ? { ...user, ...form.value } : user)); addAuditLog('UPDATE_USER', 'UserManagement', `Updated account ${form.value.email}`) } else { setUsers(items => [...items, { id: `u${Date.now()}`, ...form.value, createdAt: new Date().toISOString() }]); addAuditLog('CREATE_USER', 'UserManagement', `Created account ${form.value.email}`) }; modal.value = false }
 function togglePermission(permission: string) { form.value.permissions = form.value.permissions.includes(permission) ? form.value.permissions.filter(item => item !== permission) : [...form.value.permissions, permission] }
 function toggleStatus(id: string) { const user = users.value.find(item => item.id === id); if (!user || !window.confirm(`${user.status === 'active' ? 'Deactivate' : 'Activate'} ${user.name}?`)) return; setUsers(items => items.map(item => item.id === id ? { ...item, status: item.status === 'active' ? 'inactive' : 'active' } : item)); addAuditLog(user.status === 'active' ? 'DEACTIVATE_USER' : 'ACTIVATE_USER', 'UserManagement', `${user.name} account status changed`) }
