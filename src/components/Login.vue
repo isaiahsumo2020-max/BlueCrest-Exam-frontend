@@ -107,7 +107,8 @@ function quickLogin(nextEmail: string, nextPassword: string) {
           <div class="mt-6 border border-navy-700 rounded-lg p-4 space-y-2">
             <div class="text-navy-400 text-xs font-medium uppercase tracking-wider mb-3">Demo Credentials</div>
             <button v-for="credential in [
-              { label: 'Administrator', email: 'admin@bluecrest.edu.lr', password: 'Admin@2024', color: 'text-gold-400' },
+              { label: 'Administrator', email: 'sumo@bluecrest.edu.lr', password: 'Admin@2024', color: 'text-gold-400' },
+              { label: 'Staff (Dr. Sivarkuma)', email: 'admin@bluecrest.edu.lr', password: 'Staff@2024', color: 'text-gold-400' },
               { label: 'Staff (Emmanuel Kollie)', email: 'ekollie@bluecrest.edu.lr', password: 'Staff@2024', color: 'text-navy-300' },
               { label: 'Staff (Abigail Saye)', email: 'amsaye@bluecrest.edu.lr', password: 'Staff@2024', color: 'text-navy-300' },
             ]" :key="credential.email" type="button" class="w-full text-left flex justify-between items-center py-1 hover:opacity-80 transition-opacity" @click="quickLogin(credential.email, credential.password)">

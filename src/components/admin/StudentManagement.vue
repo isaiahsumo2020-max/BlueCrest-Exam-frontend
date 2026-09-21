@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAppStore } from '../../stores/appStore'
 import type { Student } from '../../types'
 const { students, programmes, sessions, setStudents } = useAppStore()
@@ -11,6 +11,21 @@ const filtered = computed(() => { const query = search.value.toLowerCase(); retu
 function clearFilters() { search.value = ''; filterProg.value = ''; filterSession.value = ''; filterStatus.value = '' }
 function openAdd() { editing.value = null; form.value = { ...emptyForm, programmeId: programmes.value[0]?.id ?? '', sessionId: sessions.value[0]?.id ?? '' }; modal.value = true }
 function openEdit(student: Student) { editing.value = student.id; form.value = { studentId: student.studentId, rollNumber: student.rollNumber, name: student.name, email: student.email, phone: student.phone, programmeId: student.programmeId, currentSemester: student.currentSemester, sessionId: student.sessionId, status: student.status }; modal.value = true }
+function updateNumberPreview() {
+  if (editing.value) return
+  const programme = programmes.value.find(item => item.id === form.value.programmeId)
+  const session = sessions.value.find(item => item.id === form.value.sessionId)
+  if (!programme || !session) return
+  const name = programme.name.toLowerCase()
+  const prefix = name.includes('business administration') ? 'BBA' : name.includes('information technology') ? 'BSIT' : name.includes('computer science') ? 'BSC' : programme.name.toUpperCase().replace(/[^A-Z ]/g, ' ').split(/\s+/).filter(word => word && !['OF', 'IN', 'AND', 'THE'].includes(word)).map(word => word[0]).join('').slice(0, 6) || 'STU'
+  const year = String(session.startYear)
+  const used = students.value.filter(student => student.studentId.startsWith(`${prefix}/${year}/`)).map(student => Number(student.studentId.split('/').at(-1))).filter(Number.isFinite)
+  const sequence = Math.max(0, ...used) + 1
+  const suffix = String(sequence).padStart(3, '0')
+  form.value.studentId = `${prefix}/${year}/${suffix}`
+  form.value.rollNumber = `${prefix}-${year.slice(-2)}${suffix}`
+}
+watch(() => [form.value.programmeId, form.value.sessionId], updateNumberPreview)
 function save() { if (!form.value.name || !form.value.email || !form.value.programmeId || !form.value.sessionId) return; if (editing.value) setStudents(items => items.map(student => student.id === editing.value ? { ...student, ...form.value } : student)); else setStudents(items => [...items, { id: `st${Date.now()}`, ...form.value, enrolledAt: new Date().toISOString().split('T')[0] }]); modal.value = false }
 function remove(id: string) { if (window.confirm('Remove this student record?')) setStudents(items => items.filter(student => student.id !== id)) }
 </script>
