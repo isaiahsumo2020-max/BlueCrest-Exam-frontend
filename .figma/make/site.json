@@ -1,0 +1,11 @@
+{
+  "title": "BlucCrest",
+  "description": "Streamline academic record management with a centralized ERP for universities, automating marks entry, result processing, and secure student result access.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
