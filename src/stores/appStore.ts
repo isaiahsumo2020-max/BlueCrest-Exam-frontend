@@ -13,7 +13,7 @@ import {
   type Message,
 } from '../types'
 import { computeCGPA, computeGPA, computeTotal, getGradeRule } from '../utils/calculations'
-import { deleteProgrammeRequest, deleteSemesterRequest, deleteSessionRequest, deleteStudentRequest, deleteSubjectRequest, getEntity, loginRequest, processResultsRequest, saveMarksRequest, saveProgrammeRequest, saveResultRequest, saveSemesterRequest, saveSessionRequest, saveStudentRequest, saveSubjectRequest, saveUserRequest, updateResultStatusRequest, type ApiMark, type ApiUser } from '../services/api'
+import { clearApiToken, deleteProgrammeRequest, deleteSemesterRequest, deleteSessionRequest, deleteStudentRequest, deleteSubjectRequest, getEntity, loginRequest, processResultsRequest, saveMarksRequest, saveProgrammeRequest, saveResultRequest, saveSemesterRequest, saveSessionRequest, saveStudentRequest, saveSubjectRequest, saveUserRequest, updateResultStatusRequest, type ApiMark, type ApiUser } from '../services/api'
 
 type MarksEntryInput = Omit<MarksEntry, 'totalMarks' | 'percentage' | 'grade' | 'gradePoint' | 'status'>
 
@@ -145,6 +145,7 @@ function logout() {
   state.currentUser = null
   state.currentPage = 'login'
   localStorage.removeItem('erp-session')
+  clearApiToken()
 }
 
 function navigate(page: string) {

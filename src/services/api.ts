@@ -1,10 +1,16 @@
 const browserHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? `http://${browserHost}:3001/api`
+const tokenStorageKey = 'erp-api-token'
+
+export function clearApiToken() {
+  localStorage.removeItem(tokenStorageKey)
+}
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = localStorage.getItem(tokenStorageKey)
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers ?? {}) },
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers ?? {}) },
   })
   const payload = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(payload.message ?? `Request failed with status ${response.status}`)
@@ -19,7 +25,9 @@ export async function getEntity<T>(entity: string) {
 }
 
 export async function loginRequest(email: string, password: string) {
-  return request<{ user: ApiUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+  const response = await request<{ user: ApiUser; token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+  localStorage.setItem(tokenStorageKey, response.token)
+  return response
 }
 
 export async function saveUserRequest(user: unknown) {
