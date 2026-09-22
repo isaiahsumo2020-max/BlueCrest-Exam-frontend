@@ -59,12 +59,12 @@ function quickLogin(nextEmail: string, nextPassword: string) {
           Centralized academic records, automated grade processing, GPA/CGPA calculation, and secure result publication for all programmes.
         </p>
       </div>
-      <div class="relative grid grid-cols-3 gap-4">
+      <!-- <div class="relative grid grid-cols-3 gap-4">
         <div v-for="stat in [['Programmes', '3'], ['Students', '9+'], ['Published', '7']]" :key="stat[0]" class="bg-white/5 rounded-lg p-4 border border-white/10">
           <div class="text-gold-400 font-serif text-2xl font-bold">{{ stat[1] }}</div>
           <div class="text-navy-300 text-xs mt-1">{{ stat[0] }}</div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="flex-1 flex items-center justify-center p-8">
