@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useAppStore } from '../stores/appStore'
 
-const { login, navigate } = useAppStore()
+const { login, navigate, schoolSettings } = useAppStore()
 const tab = ref<'staff' | 'student'>('staff')
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const error = ref('')
 const loading = ref(false)
+const universityName = computed(() => schoolSettings.value.schoolName || 'BlueCrest University')
+const universityLogo = computed(() => schoolSettings.value.schoolLogo || '/images/BlueCrest University.png')
 
 async function handleStaffLogin() {
   error.value = ''
@@ -40,9 +42,9 @@ function quickLogin(nextEmail: string, nextPassword: string) {
       />
       <div class="relative">
         <div class="flex items-center gap-3 mb-2">
-          <img src="/images/BlueCrest University.png" alt="BlueCrest University logo" class="w-14 h-14 object-contain" />
+          <img :src="universityLogo" :alt="`${universityName} logo`" class="w-14 h-14 object-contain" />
           <div>
-            <div class="text-white font-serif text-lg font-semibold leading-tight">BlueCrest University</div>
+            <div class="text-white font-serif text-lg font-semibold leading-tight">{{ universityName }}</div>
             <div class="text-navy-300 text-xs tracking-widest uppercase">Monrovia, Liberia</div>
           </div>
         </div>
@@ -70,9 +72,9 @@ function quickLogin(nextEmail: string, nextPassword: string) {
     <div class="flex-1 flex items-center justify-center p-8">
       <div class="w-full max-w-md">
         <div class="lg:hidden flex items-center gap-3 mb-8">
-          <img src="/images/BlueCrest University.png" alt="BlueCrest University logo" class="w-12 h-12 object-contain" />
+          <img :src="universityLogo" :alt="`${universityName} logo`" class="w-12 h-12 object-contain" />
           <div>
-            <div class="text-white font-serif font-semibold">BlueCrest University</div>
+            <div class="text-white font-serif font-semibold">{{ universityName }}</div>
             <div class="text-navy-400 text-xs">Examination & Result ERP</div>
           </div>
         </div>

@@ -9,6 +9,7 @@ export interface User {
   permissions: string[];
   status: 'active' | 'inactive';
   createdAt: string;
+  profilePicture?: string;
 }
 
 export interface Programme {
@@ -131,6 +132,17 @@ export interface Message {
   replyToId?: string;
 }
 
+export interface SchoolSettings {
+  id: string;
+  schoolName: string;
+  schoolNameSlug: string;
+  schoolLogo: string;
+  schoolLogoSlug: string;
+  profilePicture: string;
+  profilePictureSlug: string;
+  updatedAt: string;
+}
+
 export interface AppState {
   currentUser: User | null;
   currentPage: string;
@@ -144,4 +156,5 @@ export interface AppState {
   semesterResults: SemesterResult[];
   gradeRules: GradeRule[];
   auditLogs: AuditLog[];
+  schoolSettings: SchoolSettings;
 }

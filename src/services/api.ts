@@ -1,3 +1,5 @@
+import type { MarksEntry, Semester, SemesterResult, Student, Subject } from '../types'
+
 const browserHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? `http://${browserHost}:3001/api`
 const tokenStorageKey = 'erp-api-token'
@@ -8,20 +10,34 @@ export function clearApiToken() {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem(tokenStorageKey)
+  const isFormData = options.body instanceof FormData
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers ?? {}) },
+    headers: { ...(!isFormData ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers ?? {}) },
   })
   const payload = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(payload.message ?? `Request failed with status ${response.status}`)
   return payload as T
 }
 
-export type ApiUser = { id: string; name: string; email: string; role: 'admin' | 'staff'; permissions?: string[]; permissions_json?: string; status: 'active' | 'inactive'; created_at: string }
+export type ApiUser = { id: string; name: string; email: string; role: 'admin' | 'staff'; permissions?: string[]; permissions_json?: string; status: 'active' | 'inactive'; created_at: string; profile_picture?: string }
 export type ApiMark = { id: string; student_id: string; subject_id: string; semester_id: string; session_id: string; components_json: string; total_marks: number; percentage: number; grade: string; grade_point: number; status: 'pass' | 'fail'; entered_by: string; entered_at: string; updated_at: string }
+export type ApiSchoolSettings = { id: string; school_name: string; school_name_slug: string; school_logo: string; school_logo_slug: string; profile_picture: string; profile_picture_slug: string; updated_at: string }
 
 export async function getEntity<T>(entity: string) {
   return request<{ data: T[] }>(`/${entity}`)
+}
+
+export type StudentResultVerification = {
+  student: Student | null
+  results: { result: SemesterResult; semester: Semester; entries: MarksEntry[]; subjects: Subject[] }[]
+}
+
+export async function verifyStudentResultRequest(email: string, rollNumber: string, accessCode: string) {
+  return request<{ data: StudentResultVerification }>('/student-results/verify', {
+    method: 'POST',
+    body: JSON.stringify({ email, rollNumber, accessCode }),
+  })
 }
 
 export async function loginRequest(email: string, password: string) {
@@ -34,8 +50,23 @@ export async function saveUserRequest(user: unknown) {
   return request<{ data: ApiUser }>('/users', { method: 'POST', body: JSON.stringify(user) })
 }
 
+export async function updateUserProfilePictureRequest(id: string, profilePicture: string) {
+  return request<{ data: { id: string; profile_picture: string } }>(`/users/${encodeURIComponent(id)}/profile-picture`, { method: 'PATCH', body: JSON.stringify({ profilePicture }) })
+}
+
+export async function uploadImageRequest(file: File, kind: 'logo' | 'profile') {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('kind', kind)
+  return request<{ data: { url: string; path: string } }>('/media/upload', { method: 'POST', body: formData })
+}
+
 export async function saveMarksRequest(input: unknown) {
   return request<{ data: ApiMark; message: string }>('/marks', { method: 'POST', body: JSON.stringify(input) })
+}
+
+export async function saveSchoolSettingsRequest(input: unknown) {
+  return request<{ data: ApiSchoolSettings }>('/school-settings', { method: 'POST', body: JSON.stringify(input) })
 }
 
 export async function processResultsRequest(semesterId: string, sessionId: string) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, watch } from 'vue'
 import Login from './components/Login.vue'
 import StudentVerification from './components/StudentVerification.vue'
 import AppShell from './components/layout/AppShell.vue'
@@ -22,7 +22,7 @@ import StaffCourses from './components/staff/StaffCourses.vue'
 import StaffResultVerification from './components/staff/StaffResultVerification.vue'
 import StudentDashboard from './components/student/StudentDashboard.vue'
 import StudentProfile from './components/student/StudentProfile.vue'
-import { hydrateFromApi, useAppStore } from './stores/appStore'
+import { useAppStore } from './stores/appStore'
 
 const { currentUser, currentPage, navigate } = useAppStore()
 const vuePages = ['admin-dashboard', 'staff-dashboard', 'staff-students', 'staff-courses', 'result-verification', 'student-dashboard', 'student-profile', 'student-courses', 'student-results', 'student-history', 'student-transcript', 'user-management', 'audit-log', 'system-settings', 'academic-setup', 'student-management', 'marks-entry', 'marks-review', 'result-processing', 'result-approval', 'result-publication', 'reports', 'communication']
@@ -50,12 +50,6 @@ watch([currentUser, currentPage], ([user, page]) => {
   if (user?.role === 'staff' && (!staffPages.includes(page) || (permission && !user.permissions.includes(permission)))) navigate('staff-dashboard')
   if (user?.role === 'student' && !studentPages.includes(page)) navigate('student-dashboard')
 })
-onMounted(async () => {
-  try {
-    await hydrateFromApi()
-  } catch (error) { console.error('Backend unavailable. Start the Express API before using the application.', error) }
-})
-
 </script>
 
 <template>

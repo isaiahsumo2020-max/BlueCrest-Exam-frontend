@@ -11,9 +11,10 @@ import {
   type GradeRule,
   type AuditLog,
   type Message,
+  type SchoolSettings,
 } from '../types'
 import { computeCGPA, computeGPA, computeTotal, getGradeRule } from '../utils/calculations'
-import { clearApiToken, deleteAuditRequest, deleteProgrammeRequest, deleteSemesterRequest, deleteSessionRequest, deleteStudentRequest, deleteSubjectRequest, getEntity, loginRequest, processResultsRequest, saveMarksRequest, saveProgrammeRequest, saveResultRequest, saveSemesterRequest, saveSessionRequest, saveStudentRequest, saveSubjectRequest, saveUserRequest, updateResultStatusRequest, type ApiMark, type ApiUser } from '../services/api'
+import { clearApiToken, deleteAuditRequest, deleteProgrammeRequest, deleteSemesterRequest, deleteSessionRequest, deleteStudentRequest, deleteSubjectRequest, getEntity, loginRequest, processResultsRequest, saveMarksRequest, saveProgrammeRequest, saveResultRequest, saveSchoolSettingsRequest, saveSemesterRequest, saveSessionRequest, saveStudentRequest, saveSubjectRequest, saveUserRequest, updateResultStatusRequest, updateUserProfilePictureRequest, type ApiMark, type ApiSchoolSettings, type ApiUser } from '../services/api'
 
 type MarksEntryInput = Omit<MarksEntry, 'totalMarks' | 'percentage' | 'grade' | 'gradePoint' | 'status'>
 
@@ -31,6 +32,18 @@ type AppState = {
   gradeRules: GradeRule[]
   auditLogs: AuditLog[]
   messages: Message[]
+  schoolSettings: SchoolSettings
+}
+
+const defaultSchoolSettings: SchoolSettings = {
+  id: 'default',
+  schoolName: 'BlueCrest University',
+  schoolNameSlug: 'bluecrest-university',
+  schoolLogo: '/images/BlueCrest University.png',
+  schoolLogoSlug: 'bluecrest-university',
+  profilePicture: '/images/BlueCrest University.png',
+  profilePictureSlug: 'bluecrest-university',
+  updatedAt: new Date().toISOString(),
 }
 
 const state = reactive<AppState>({
@@ -47,6 +60,7 @@ const state = reactive<AppState>({
   gradeRules: [],
   auditLogs: [],
   messages: [],
+  schoolSettings: { ...defaultSchoolSettings },
 })
 
 const messagesStorageKey = 'erp-messages'
@@ -85,18 +99,32 @@ function persistSubjects(items: Subject[], previous: Subject[]) {
 }
 
 function mapUser(user: ApiUser): User {
-  return { id: user.id, name: user.name, email: user.email, password: '', role: user.role, permissions: user.permissions ?? (user.permissions_json ? JSON.parse(user.permissions_json) : []), status: user.status, createdAt: user.created_at }
+  return { id: user.id, name: user.name, email: user.email, password: '', role: user.role, permissions: user.permissions ?? (user.permissions_json ? JSON.parse(user.permissions_json) : []), status: user.status, createdAt: user.created_at, profilePicture: user.profile_picture ?? '' }
 }
 
 function mapMark(mark: ApiMark): MarksEntry {
   return { id: mark.id, studentId: mark.student_id, subjectId: mark.subject_id, semesterId: mark.semester_id, sessionId: mark.session_id, components: JSON.parse(mark.components_json), totalMarks: mark.total_marks, percentage: mark.percentage, grade: mark.grade, gradePoint: mark.grade_point, status: mark.status, enteredBy: mark.entered_by, enteredAt: mark.entered_at, updatedAt: mark.updated_at }
 }
 
+function mapSchoolSettings(item: ApiSchoolSettings | null | undefined): SchoolSettings {
+  if (!item) return { ...defaultSchoolSettings }
+  return {
+    id: item.id || 'default',
+    schoolName: item.school_name || defaultSchoolSettings.schoolName,
+    schoolNameSlug: item.school_name_slug || defaultSchoolSettings.schoolNameSlug,
+    schoolLogo: item.school_logo || defaultSchoolSettings.schoolLogo,
+    schoolLogoSlug: item.school_logo_slug || defaultSchoolSettings.schoolLogoSlug,
+    profilePicture: item.profile_picture || defaultSchoolSettings.profilePicture,
+    profilePictureSlug: item.profile_picture_slug || defaultSchoolSettings.profilePictureSlug,
+    updatedAt: item.updated_at || defaultSchoolSettings.updatedAt,
+  }
+}
+
 export async function hydrateFromApi() {
-  const [apiUsers, apiProgrammes, apiSessions, apiSemesters, apiSubjects, apiStudents, apiMarks, apiResults, apiRules, apiAudit] = await Promise.all([
+  const [apiUsers, apiProgrammes, apiSessions, apiSemesters, apiSubjects, apiStudents, apiMarks, apiResults, apiRules, apiAudit, apiSchoolSettings] = await Promise.all([
     getEntity<ApiUser>('users'), getEntity<Record<string, any>>('programmes'), getEntity<Record<string, any>>('sessions'), getEntity<Record<string, any>>('semesters'),
     getEntity<Record<string, any>>('subjects'), getEntity<Record<string, any>>('students'), getEntity<ApiMark>('marks'), getEntity<Record<string, any>>('results'),
-    getEntity<Record<string, any>>('grade-rules'), getEntity<Record<string, any>>('audit'),
+    getEntity<Record<string, any>>('grade-rules'), getEntity<Record<string, any>>('audit'), getEntity<ApiSchoolSettings>('school-settings'),
   ])
   replaceItems(state.users, apiUsers.data.map(mapUser))
   replaceItems(state.programmes, apiProgrammes.data.map(item => ({ id: item.id, name: item.name, department: item.department, duration: item.duration, totalSemesters: item.total_semesters, status: item.status })))
@@ -110,8 +138,33 @@ export async function hydrateFromApi() {
   const remoteAudit = apiAudit.data.map(item => ({ id: item.id, userId: item.user_id, userName: item.user_name, action: item.action, entity: item.entity, details: item.details, timestamp: item.timestamp }))
   const localAudit = JSON.parse(localStorage.getItem(localAuditStorageKey) ?? '[]') as AuditLog[]
   replaceItems(state.auditLogs, [...localAudit, ...remoteAudit])
+  state.schoolSettings = mapSchoolSettings(apiSchoolSettings.data[0])
   const savedMessages = localStorage.getItem(messagesStorageKey)
   if (savedMessages) replaceItems(state.messages, JSON.parse(savedMessages) as Message[])
+}
+
+async function saveSchoolSettings(settings: Partial<SchoolSettings>) {
+  const payload = {
+    id: settings.id ?? state.schoolSettings.id ?? 'default',
+    schoolName: settings.schoolName ?? state.schoolSettings.schoolName,
+    schoolNameSlug: settings.schoolNameSlug ?? state.schoolSettings.schoolNameSlug,
+    schoolLogo: settings.schoolLogo ?? state.schoolSettings.schoolLogo,
+    schoolLogoSlug: settings.schoolLogoSlug ?? state.schoolSettings.schoolLogoSlug,
+    profilePicture: settings.profilePicture ?? state.schoolSettings.profilePicture,
+    profilePictureSlug: settings.profilePictureSlug ?? state.schoolSettings.profilePictureSlug,
+    updatedAt: new Date().toISOString(),
+  }
+
+  const response = await saveSchoolSettingsRequest(payload)
+  state.schoolSettings = mapSchoolSettings(response.data)
+  return state.schoolSettings
+}
+
+async function updateUserProfilePicture(userId: string, profilePicture: string) {
+  const response = await updateUserProfilePictureRequest(userId, profilePicture)
+  const user = state.users.find(item => item.id === userId)
+  if (user) user.profilePicture = response.data.profile_picture
+  if (state.currentUser?.id === userId) state.currentUser = { ...state.currentUser, profilePicture: response.data.profile_picture }
 }
 
 function addAuditLog(action: string, entity: string, details: string) {
@@ -144,6 +197,7 @@ async function login(email: string, password: string) {
     state.currentUser = user
     state.currentPage = user.role === 'admin' ? 'admin-dashboard' : user.role === 'student' ? 'student-dashboard' : 'staff-dashboard'
     localStorage.setItem('erp-session', JSON.stringify({ user, page: state.currentPage }))
+    await hydrateFromApi()
   }
   return user
 }
@@ -316,6 +370,7 @@ export function useAppStore() {
     gradeRules: computed(() => state.gradeRules),
     auditLogs: computed(() => state.auditLogs),
     messages: computed(() => state.messages),
+    schoolSettings: computed(() => state.schoolSettings),
     login,
     logout,
     navigate,
@@ -326,7 +381,7 @@ export function useAppStore() {
     setStudents: (updater: Student[] | ((items: Student[]) => Student[])) => { const previous = [...state.students]; replaceItems(state.students, updater); persistStudents(state.students, previous) },
     setUsers: (updater: User[] | ((items: User[]) => User[])) => {
       replaceItems(state.users, updater)
-      state.users.forEach(user => { void saveUserRequest({ id: user.id, name: user.name, email: user.email, password: user.password, role: user.role, permissions: user.permissions, status: user.status, createdAt: user.createdAt }).catch(() => undefined) })
+      state.users.forEach(user => { void saveUserRequest({ id: user.id, name: user.name, email: user.email, password: user.password, role: user.role, permissions: user.permissions, status: user.status, createdAt: user.createdAt, profilePicture: user.profilePicture ?? '' }).catch(() => undefined) })
       if (state.currentUser) {
         const refreshedUser = state.users.find(user => user.id === state.currentUser?.id)
         if (refreshedUser) state.currentUser = { ...refreshedUser }
@@ -340,6 +395,8 @@ export function useAppStore() {
     deleteAuditLog,
     sendMessage,
     markMessageRead,
+    saveSchoolSettings,
+    updateUserProfilePicture,
     getStudentResult,
   }
 }
