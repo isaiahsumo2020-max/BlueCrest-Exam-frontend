@@ -46,9 +46,21 @@ const defaultSchoolSettings: SchoolSettings = {
   updatedAt: new Date().toISOString(),
 }
 
+const storedSession = (() => {
+  try {
+    const value = localStorage.getItem('erp-session')
+    if (!value) return null
+    const session = JSON.parse(value) as { user?: User; page?: string }
+    if (!session.user?.id || !session.user.email || typeof session.page !== 'string') return null
+    return session
+  } catch {
+    return null
+  }
+})()
+
 const state = reactive<AppState>({
-  currentUser: null,
-  currentPage: 'login',
+  currentUser: storedSession?.user ?? null,
+  currentPage: storedSession?.page ?? 'login',
   users: [],
   programmes: [],
   sessions: [],
@@ -143,6 +155,8 @@ export async function hydrateFromApi() {
   if (savedMessages) replaceItems(state.messages, JSON.parse(savedMessages) as Message[])
 }
 
+if (storedSession) void hydrateFromApi().catch(() => undefined)
+
 async function saveSchoolSettings(settings: Partial<SchoolSettings>) {
   const payload = {
     id: settings.id ?? state.schoolSettings.id ?? 'default',
@@ -211,6 +225,7 @@ function logout() {
 
 function navigate(page: string) {
   state.currentPage = page
+  if (state.currentUser) localStorage.setItem('erp-session', JSON.stringify({ user: state.currentUser, page }))
 }
 
 function persistMessages() {

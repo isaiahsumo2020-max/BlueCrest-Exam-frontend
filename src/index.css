@@ -42,7 +42,28 @@ body {
 ::-webkit-scrollbar-thumb { background: #b3cde6; border-radius: 3px; }
 
 @media print {
-  .no-print  { display: none !important; }
+  .no-print { display: none !important; }
   .print-only { display: block !important; }
-  body { background: white; }
+  body {
+    background: white;
+    margin: 0;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  #result-print,
+  #result-print * {
+    visibility: visible !important;
+  }
+  #result-print {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #result-card {
+    border-radius: 0;
+    overflow: visible;
+  }
 }
