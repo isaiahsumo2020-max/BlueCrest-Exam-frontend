@@ -1,7 +1,9 @@
 import type { MarksEntry, Semester, SemesterResult, Student, Subject } from '../types'
 
 const browserHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? `http://${browserHost}:3001/api`
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.VITE_SUPABASE_URL
+  ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/api`
+  : `http://${browserHost}:3001/api`)
 const tokenStorageKey = 'erp-api-token'
 
 export function clearApiToken() {
