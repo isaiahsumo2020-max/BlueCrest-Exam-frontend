@@ -30,6 +30,20 @@ export async function getEntity<T>(entity: string) {
   return request<{ data: T[] }>(`/${entity}`)
 }
 
+export type SystemDiagnostics = {
+  apiStatus: 'operational'
+  databaseStatus: 'operational' | 'unavailable'
+  databaseLatencyMs: number
+  apiPlatform: string
+  edgeRuntime: string
+  databasePlatform: string
+  checkedAt: string
+}
+
+export async function getSystemDiagnosticsRequest() {
+  return request<{ data: SystemDiagnostics }>('/system/diagnostics')
+}
+
 export type StudentResultVerification = {
   student: Student | null
   results: { result: SemesterResult; semester: Semester; entries: MarksEntry[]; subjects: Subject[] }[]
