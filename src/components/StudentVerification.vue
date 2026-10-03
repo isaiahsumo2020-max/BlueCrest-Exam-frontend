@@ -69,6 +69,7 @@ const gradeScale = [
       <div v-if="error" class="bg-red-900/40 border border-red-700/50 text-red-300 text-sm px-5 py-4 rounded-xl mb-6">⚠️ {{ error }}</div>
       <div v-if="data" id="result-print" class="space-y-6">
         <div class="bg-white rounded-2xl overflow-hidden" id="result-card">
+          <img :src="universityLogo" alt="" aria-hidden="true" class="result-watermark" />
           <div class="bg-blue-950 px-6 py-5"><div class="flex items-center justify-center gap-5"><img :src="universityLogo" :alt="`${universityName} logo`" class="w-32 h-32 object-contain shrink-0" /><div class="text-left"><div class="text-blue-400 text-3x6 font-bold tracking-widest uppercase mb-2">{{ universityName }} Monrovia, Liberia</div><div class="font-serif text-white text-xl font-bold">Official Semester Result Statement</div><div class="text-navy-400 text-xs mt-1">This result is published and verified by the Examination Office</div></div></div></div>
           <div class="bg-navy-50 px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
             <div v-for="item in [['Student Name', data.student.name], ['Roll Number', data.student.rollNumber], ['Student ID', data.student.studentId], ['Email', data.student.email]]" :key="item[0]"><div class="text-blue-700 text-xs">{{ item[0] }}</div><div class="text-blue-900 font-medium text-sm">{{ item[1] }}</div></div>

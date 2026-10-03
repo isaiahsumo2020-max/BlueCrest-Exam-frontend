@@ -74,6 +74,8 @@ body {
 .signature-label { margin-top: 5px; color: #1e293b; font-size: 0.75rem; }
 .stamp-block { display: flex; width: 76px; height: 76px; align-items: center; justify-content: center; }
 .stamp-image { display: block; width: 72px; height: 72px; object-fit: contain; }
+.result-watermark { display: none; }
+.report-official-print { display: none; }
 
 @media print {
   @page { size: A4 portrait; margin: 10mm; }
@@ -87,10 +89,15 @@ body {
     visibility: hidden !important;
   }
   #result-print,
-  #result-print * {
+  #result-print *,
+  #report-area,
+  #report-area *,
+  #report-print-footer,
+  #report-print-footer * {
     visibility: visible !important;
   }
   #result-print {
+    display: block !important;
     position: absolute;
     inset: 0;
     width: 100%;
@@ -98,21 +105,146 @@ body {
     padding: 0;
   }
   #result-card {
+    position: relative;
+    isolation: isolate;
     border-radius: 0;
     overflow: visible;
   }
+  #result-card > .result-watermark {
+    display: block !important;
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    width: 70%;
+    max-width: 105mm;
+    max-height: 125mm;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    opacity: 0.04;
+    pointer-events: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  #result-card > :not(.result-watermark) {
+    position: relative;
+    z-index: 1;
+  }
+  #report-area {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    overflow: visible !important;
+  }
+  #report-area .overflow-x-auto {
+    overflow: visible !important;
+  }
+  #report-area table {
+    width: 100%;
+    font-size: 8pt;
+  }
+  #report-area th,
+  #report-area td {
+    padding: 1.5mm 1.8mm !important;
+  }
+  #report-area tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  #report-area > div:first-child,
+  #report-area > div:nth-child(2) {
+    padding: 4mm !important;
+  }
+  #report-print-footer {
+    display: block !important;
+    margin-top: 5mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .report-grade-scale {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 1.5mm;
+    margin-bottom: 5mm;
+    break-inside: avoid;
+  }
+  .report-grade-cell {
+    display: grid;
+    gap: 0.5mm;
+    border: 0.2mm solid #cbd5e1;
+    padding: 1.5mm 1mm;
+    color: #334155;
+    font-size: 7pt;
+    text-align: center;
+  }
+  .report-grade-cell strong { color: #0f2840; font-size: 8pt; }
+  .report-signature-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 38mm minmax(0, 1fr);
+    align-items: end;
+    gap: 6mm;
+    min-height: 45mm;
+    padding: 3mm 2mm 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .report-signature-block {
+    display: flex;
+    min-width: 0;
+    min-height: 30mm;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    text-align: center;
+    break-inside: avoid;
+  }
+  .report-signature-left { grid-column: 1; }
+  .report-signature-right { grid-column: 3; }
+  .report-signature-image {
+    display: block;
+    width: auto;
+    max-width: 55mm;
+    max-height: 17mm;
+    margin-bottom: 1mm;
+    object-fit: contain;
+    object-position: center bottom;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .report-signature-line { width: 100%; max-width: 60mm; border-top: 0.25mm solid #475569; }
+  .report-signature-label { margin-top: 1.5mm; color: #1e293b; font-size: 8pt; }
+  .report-stamp-block {
+    display: flex;
+    grid-column: 2;
+    width: 38mm;
+    height: 38mm;
+    align-items: center;
+    justify-content: center;
+    break-inside: avoid;
+  }
+  .report-stamp-image {
+    display: block;
+    width: 36mm;
+    height: 36mm;
+    object-fit: contain;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
   .result-signatures {
     gap: 12mm;
-    min-height: 34mm;
+    min-height: 48mm;
     padding: 7mm 4mm 2mm !important;
     break-inside: avoid;
     page-break-inside: avoid;
     color: #111827 !important;
   }
-  .signature-block { min-height: 27mm; break-inside: avoid; }
+  .signature-block { min-height: 31mm; break-inside: avoid; }
   .signature-image { max-width: 42mm; max-height: 16mm; margin-bottom: 1mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .signature-rule { max-width: 55mm; border-top: 0.25mm solid #475569; }
   .signature-label { margin-top: 1.5mm; color: #1e293b; font-size: 8pt; }
-  .stamp-block { width: 24mm; height: 24mm; break-inside: avoid; }
-  .stamp-image { width: 22mm; height: 22mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .stamp-block { width: 38mm; height: 38mm; break-inside: avoid; }
+  .stamp-image { width: 36mm; height: 36mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
+
+.report-print-only { display: none; }

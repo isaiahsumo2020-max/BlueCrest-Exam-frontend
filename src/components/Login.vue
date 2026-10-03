@@ -122,7 +122,7 @@ function quickLogin(nextEmail: string, nextPassword: string) {
 
         <div v-else class="text-center space-y-4">
           <div class="bg-navy-900 border border-navy-700 rounded-xl p-8">
-            <div class="text-4xl mb-4">🎓</div>
+            <div class="text-4xl mb-4"> </div>
             <h2 class="text-white font-serif text-xl mb-2">Check Your Result</h2>
             <p class="text-navy-400 text-sm mb-6">Enter your registered Email ID and Roll Number to view your published semester results.</p>
             <button class="w-full bg-gold-400 hover:bg-gold-300 text-navy-950 font-semibold py-3 rounded-lg transition-colors text-sm" @click="navigate('student-verification')">
