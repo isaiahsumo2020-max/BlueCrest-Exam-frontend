@@ -42,10 +42,10 @@ function quickLogin(nextEmail: string, nextPassword: string) {
       />
       <div class="relative">
         <div class="flex items-center gap-3 mb-2">
-          <img :src="universityLogo" :alt="`${universityName} logo`" class="w-14 h-14 object-contain" />
+          <img :src="universityLogo" :alt="`${universityName} logo`" class="w-20 h-20 object-contain" />
           <div>
-            <div class="text-white font-serif text-lg font-semibold leading-tight">{{ universityName }}</div>
-            <div class="text-blue-300 text-xs tracking-widest uppercase">Monrovia, Liberia</div>
+            <div class="text-white font-serif text-4x1 font-bold leading-tight">{{ universityName }}</div>
+            <div class="text-black text-xs tracking-widest uppercase">Monrovia, Liberia</div>
           </div>
         </div>
       </div>
@@ -69,13 +69,13 @@ function quickLogin(nextEmail: string, nextPassword: string) {
       </div> -->
     </div>
 
-    <div class="flex-1 flex items-center justify-center p-8">
+    <div class="flex-1 flex items-center justify-center bg-white p-8">
       <div class="w-full max-w-md">
         <div class="lg:hidden flex items-center gap-3 mb-8">
           <img :src="universityLogo" :alt="`${universityName} logo`" class="w-24 h-24 object-contain" />
           <div>
-            <div class="text-white font-serif text-x1 font-bold">{{ universityName }}</div>
-            <div class="text-blue-300 text-xs">Examination & Result ERP</div>
+            <div class="text-blue-900 font-serif text-3x1 font-bold">{{ universityName }}</div>
+            <div class="text-blue-700 text-xs">Examination & Result ERP</div>
           </div>
         </div>
 
@@ -88,22 +88,22 @@ function quickLogin(nextEmail: string, nextPassword: string) {
           </button>
         </div>
 
-        <form v-if="tab === 'staff'" class="space-y-5" @submit.prevent="handleStaffLogin">
+        <form v-if="tab === 'staff'" class="bg-blue-900 border-blue-700 rounded-xl p-8 space-y-5" @submit.prevent="handleStaffLogin">
           <div>
             <label class="block text-navy-200 text-sm mb-2">Email Address</label>
-            <input v-model="email" type="email" placeholder="your@bluecrest.edu.lr" required class="w-full bg-navy-900 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold-600 transition-colors" />
+            <input v-model="email" type="email" placeholder="your@bluecrest.edu.lr" required class="w-97 bg-gray-600 border border-gray-500 text-white placeholder-navy-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gold-600 transition-colors" />
           </div>
           <div>
             <label class="block text-navy-200 text-sm mb-2">Password</label>
             <div class="relative">
-              <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" required class="w-full bg-navy-900 border border-navy-700 text-white placeholder-navy-500 rounded-lg px-4 pr-12 py-3 text-sm focus:outline-none focus:border-gold-600 transition-colors" />
+              <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" required class="w-97 bg-gray-600 border border-gray-500 text-white placeholder-navy-500 rounded-lg px-4 pr-12 py-3 text-sm focus:outline-none focus:border-gold-600 transition-colors" />
               <button type="button" :aria-label="showPassword ? 'Hide password' : 'Show password'" :title="showPassword ? 'Hide password' : 'Show password'" class="absolute inset-y-0 right-0 px-4 text-navy-400 hover:text-gold-600 transition-colors" @click="showPassword = !showPassword">
                 <span aria-hidden="true">👁</span>
               </button>
             </div>
           </div>
           <div v-if="error" class="bg-red-900/40 border border-red-700/50 text-red-300 text-sm px-4 py-3 rounded-lg">{{ error }}</div>
-          <button type="submit" :disabled="loading" class="w-full bg-gold-600 hover:bg-gold-500 text-blue-950 font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 text-sm">
+          <button type="submit" :disabled="loading" class="w-97 bg-gold-600 hover:bg-gold-500 text-blue-950 font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 text-sm">
             {{ loading ? 'Signing in…' : 'Sign In' }}
           </button>
           <div class="mt-6 border border-navy-700 rounded-lg p-4 space-y-2">
@@ -121,15 +121,15 @@ function quickLogin(nextEmail: string, nextPassword: string) {
         </form>
 
         <div v-else class="text-center space-y-4">
-          <div class="bg-navy-900 border border-navy-700 rounded-xl p-8">
+          <div class="bg-blue-900 border border-blue-700 rounded-xl p-8">
             <div class="text-4xl mb-4"> </div>
             <h2 class="text-white font-serif text-xl mb-2">Check Your Result</h2>
-            <p class="text-navy-400 text-sm mb-6">Enter your registered Email ID and Roll Number to view your published semester results.</p>
-            <button class="w-full bg-gold-400 hover:bg-gold-300 text-navy-950 font-semibold py-3 rounded-lg transition-colors text-sm" @click="navigate('student-verification')">
+            <p class="text-navy-100 text-sm mb-6">Enter your registered Email ID and Roll Number to view your published semester results.</p>
+            <button class="w-full bg-gold-400 hover:bg-gold-300 text-blue-900 font-semibold py-3 rounded-lg transition-colors text-sm" @click="navigate('student-verification')">
               Go to Result Verification →
             </button>
           </div>
-          <p class="text-navy-500 text-xs">Only officially published results are available for verification.</p>
+          <p class="text-blue-700 text-xs">Only officially published results are available for verification.</p>
         </div>
       </div>
     </div>
