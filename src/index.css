@@ -41,7 +41,42 @@ body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #b3cde6; border-radius: 3px; }
 
+.result-signatures {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 1.5rem;
+  min-height: 130px;
+}
+.head-signature-block { grid-column: 1; }
+.stamp-block { grid-column: 2; }
+.authorized-signature-block { grid-column: 3; }
+.signature-block {
+  display: flex;
+  min-width: 0;
+  min-height: 105px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  text-align: center;
+}
+.signature-image {
+  display: block;
+  width: auto;
+  max-width: 170px;
+  height: auto;
+  max-height: 64px;
+  margin-bottom: 4px;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.signature-rule { width: 100%; max-width: 220px; border-top: 1px solid #64748b; }
+.signature-label { margin-top: 5px; color: #1e293b; font-size: 0.75rem; }
+.stamp-block { display: flex; width: 76px; height: 76px; align-items: center; justify-content: center; }
+.stamp-image { display: block; width: 72px; height: 72px; object-fit: contain; }
+
 @media print {
+  @page { size: A4 portrait; margin: 10mm; }
   .no-print { display: none !important; }
   .print-only { display: block !important; }
   body {
@@ -66,4 +101,18 @@ body {
     border-radius: 0;
     overflow: visible;
   }
+  .result-signatures {
+    gap: 12mm;
+    min-height: 34mm;
+    padding: 7mm 4mm 2mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    color: #111827 !important;
+  }
+  .signature-block { min-height: 27mm; break-inside: avoid; }
+  .signature-image { max-width: 42mm; max-height: 16mm; margin-bottom: 1mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .signature-rule { max-width: 55mm; border-top: 0.25mm solid #475569; }
+  .signature-label { margin-top: 1.5mm; color: #1e293b; font-size: 8pt; }
+  .stamp-block { width: 24mm; height: 24mm; break-inside: avoid; }
+  .stamp-image { width: 22mm; height: 22mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }

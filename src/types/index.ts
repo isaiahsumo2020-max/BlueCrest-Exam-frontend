@@ -140,6 +140,13 @@ export interface SchoolSettings {
   schoolLogoSlug: string;
   profilePicture: string;
   profilePictureSlug: string;
+  headExamSignature: string;
+  headExamSignatureEnabled: boolean;
+  authorizedSignature: string;
+  authorizedSignatureEnabled: boolean;
+  authorizedSignatureLabel: string;
+  officialStamp: string;
+  officialStampEnabled: boolean;
   updatedAt: string;
 }
 

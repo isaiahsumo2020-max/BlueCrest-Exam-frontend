@@ -24,7 +24,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export type ApiUser = { id: string; name: string; email: string; role: 'admin' | 'staff'; permissions?: string[]; permissions_json?: string; status: 'active' | 'inactive'; created_at: string; profile_picture?: string }
 export type ApiMark = { id: string; student_id: string; subject_id: string; semester_id: string; session_id: string; components_json: string; total_marks: number; percentage: number; grade: string; grade_point: number; status: 'pass' | 'fail'; entered_by: string; entered_at: string; updated_at: string }
-export type ApiSchoolSettings = { id: string; school_name: string; school_name_slug: string; school_logo: string; school_logo_slug: string; profile_picture: string; profile_picture_slug: string; updated_at: string }
+export type ApiSchoolSettings = { id: string; school_name: string; school_name_slug: string; school_logo: string; school_logo_slug: string; profile_picture: string; profile_picture_slug: string; head_exam_signature?: string; head_exam_signature_enabled?: boolean; authorized_signature?: string; authorized_signature_enabled?: boolean; authorized_signature_label?: string; official_stamp?: string; official_stamp_enabled?: boolean; updated_at: string }
 
 export async function getEntity<T>(entity: string) {
   return request<{ data: T[] }>(`/${entity}`)
@@ -47,6 +47,7 @@ export async function getSystemDiagnosticsRequest() {
 export type StudentResultVerification = {
   student: Student | null
   results: { result: SemesterResult; semester: Semester; entries: MarksEntry[]; subjects: Subject[] }[]
+  resultSignatures?: { headExamSignature: string; headExamSignatureEnabled: boolean; authorizedSignature: string; authorizedSignatureEnabled: boolean; authorizedSignatureLabel: string; officialStamp: string; officialStampEnabled: boolean }
 }
 
 export async function verifyStudentResultRequest(email: string, rollNumber: string, accessCode: string) {
@@ -70,7 +71,7 @@ export async function updateUserProfilePictureRequest(id: string, profilePicture
   return request<{ data: { id: string; profile_picture: string } }>(`/users/${encodeURIComponent(id)}/profile-picture`, { method: 'PATCH', body: JSON.stringify({ profilePicture }) })
 }
 
-export async function uploadImageRequest(file: File, kind: 'logo' | 'profile') {
+export async function uploadImageRequest(file: File, kind: 'logo' | 'profile' | 'head-exam-signature' | 'authorized-signature' | 'official-stamp') {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('kind', kind)

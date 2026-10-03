@@ -33,6 +33,7 @@ async function handleSearch() {
 const latestResult = computed(() => data.value?.results[data.value.results.length - 1])
 const universityName = computed(() => schoolSettings.value.schoolName || 'BlueCrest University')
 const universityLogo = computed(() => schoolSettings.value.schoolLogo || '/images/BlueCrest University.png')
+const resultSignatures = computed(() => data.value?.resultSignatures)
 function printResult() { window.print() }
 const gradeScale = [
   ['A', '80–100', '4.0'], ['B+', '75–79', '3.5'], ['B', '70–74', '3.0'], ['C+', '65–69', '2.5'],
@@ -79,6 +80,21 @@ const gradeScale = [
             <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-blue-500 uppercase border-b border-navy-100 text-left"><th class="px-6 py-2.5">Subject</th><th class="px-4 py-2.5">Code</th><th class="px-4 py-2.5 text-center">Marks</th><th class="px-4 py-2.5 text-center">%</th><th class="px-4 py-2.5 text-center">Grade</th><th class="px-4 py-2.5 text-center">Points</th><th class="px-4 py-2.5 text-center">Credits</th><th class="px-4 py-2.5 text-center">Status</th></tr></thead><tbody class="divide-y divide-navy-50"><tr v-for="entry in item.entries" :key="entry.id" class="hover:bg-navy-50/50"><template v-if="subjects.find(subject => subject.id === entry.subjectId)"><td class="px-6 py-3 text-blue-800">{{ subjects.find(subject => subject.id === entry.subjectId)?.title }}</td><td class="px-4 py-3 font-mono text-xs text-blue-500">{{ subjects.find(subject => subject.id === entry.subjectId)?.code }}</td><td class="px-4 py-3 text-center font-mono">{{ entry.totalMarks }}/{{ subjects.find(subject => subject.id === entry.subjectId)?.components.reduce((sum, c) => sum + c.maxMarks, 0) }}</td><td class="px-4 py-3 text-center font-mono">{{ entry.percentage }}%</td><td class="px-4 py-3 text-center"><span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold" :class="gradeColor(entry.grade)">{{ entry.grade }}</span></td><td class="px-4 py-3 text-center font-mono">{{ entry.gradePoint.toFixed(1) }}</td><td class="px-4 py-3 text-center font-mono">{{ subjects.find(subject => subject.id === entry.subjectId)?.credits }}</td><td class="px-4 py-3 text-center"><span class="text-xs font-medium px-2 py-0.5 rounded-full" :class="entry.status === 'pass' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'">{{ entry.status.toUpperCase() }}</span></td></template></tr></tbody></table></div>
           </div>
           <div class="px-6 py-4 bg-blue-50 border-t border-navy-100 text-xs text-blue-400 flex items-center justify-between"><span>Published by {{ universityName }} Examination Office</span><span>Verified: {{ latestResult?.result.publishedAt ? new Date(latestResult.result.publishedAt).toLocaleDateString('en-LR') : '—' }}</span></div>
+          <div v-if="resultSignatures && (resultSignatures.headExamSignatureEnabled || resultSignatures.authorizedSignatureEnabled || resultSignatures.officialStampEnabled)" class="result-signatures border-t border-navy-100 px-6 py-5">
+            <div class="signature-block head-signature-block">
+              <img v-if="resultSignatures.headExamSignatureEnabled && resultSignatures.headExamSignature" :src="resultSignatures.headExamSignature" alt="Head of Examination signature" class="signature-image" />
+              <div class="signature-rule"></div>
+              <div class="signature-label">Head of Examination</div>
+            </div>
+            <div v-if="resultSignatures.officialStampEnabled && resultSignatures.officialStamp" class="stamp-block">
+              <img :src="resultSignatures.officialStamp" alt="Official university stamp" class="stamp-image" />
+            </div>
+            <div class="signature-block authorized-signature-block">
+              <img v-if="resultSignatures.authorizedSignatureEnabled && resultSignatures.authorizedSignature" :src="resultSignatures.authorizedSignature" :alt="`${resultSignatures.authorizedSignatureLabel} signature`" class="signature-image" />
+              <div class="signature-rule"></div>
+              <div class="signature-label">{{ resultSignatures.authorizedSignatureLabel }}</div>
+            </div>
+          </div>
         </div>
         <div class="bg-blue-900 border border-blue-800 rounded-xl p-5"><div class="text-white text-xs font-medium uppercase tracking-wider mb-3">Grading Scale</div><div class="grid grid-cols-4 sm:grid-cols-8 gap-2 text-xs text-center"><div v-for="scale in gradeScale" :key="scale[0]" class="rounded p-2" :class="scale[0] === 'F' ? 'bg-red-900/30' : 'bg-blue-900'"><div class="font-mono font-bold" :class="scale[0] === 'F' ? 'text-red-400' : 'text-gold-400'">{{ scale[0] }}</div><div class="text-blue-200 mt-0.5">{{ scale[1] }}</div><div class="text-white">GP {{ scale[2] }}</div></div></div></div>
       </div>

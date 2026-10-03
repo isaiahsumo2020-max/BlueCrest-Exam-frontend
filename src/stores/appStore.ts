@@ -43,6 +43,13 @@ const defaultSchoolSettings: SchoolSettings = {
   schoolLogoSlug: 'bluecrest-university',
   profilePicture: '/images/BlueCrest University.png',
   profilePictureSlug: 'bluecrest-university',
+  headExamSignature: '',
+  headExamSignatureEnabled: false,
+  authorizedSignature: '',
+  authorizedSignatureEnabled: false,
+  authorizedSignatureLabel: 'Authorized Signatory',
+  officialStamp: '',
+  officialStampEnabled: false,
   updatedAt: new Date().toISOString(),
 }
 
@@ -128,6 +135,13 @@ function mapSchoolSettings(item: ApiSchoolSettings | null | undefined): SchoolSe
     schoolLogoSlug: item.school_logo_slug || defaultSchoolSettings.schoolLogoSlug,
     profilePicture: item.profile_picture || defaultSchoolSettings.profilePicture,
     profilePictureSlug: item.profile_picture_slug || defaultSchoolSettings.profilePictureSlug,
+    headExamSignature: item.head_exam_signature || '',
+    headExamSignatureEnabled: Boolean(item.head_exam_signature_enabled),
+    authorizedSignature: item.authorized_signature || '',
+    authorizedSignatureEnabled: Boolean(item.authorized_signature_enabled),
+    authorizedSignatureLabel: item.authorized_signature_label || defaultSchoolSettings.authorizedSignatureLabel,
+    officialStamp: item.official_stamp || '',
+    officialStampEnabled: Boolean(item.official_stamp_enabled),
     updatedAt: item.updated_at || defaultSchoolSettings.updatedAt,
   }
 }
@@ -166,6 +180,13 @@ async function saveSchoolSettings(settings: Partial<SchoolSettings>) {
     schoolLogoSlug: settings.schoolLogoSlug ?? state.schoolSettings.schoolLogoSlug,
     profilePicture: settings.profilePicture ?? state.schoolSettings.profilePicture,
     profilePictureSlug: settings.profilePictureSlug ?? state.schoolSettings.profilePictureSlug,
+    headExamSignature: settings.headExamSignature ?? state.schoolSettings.headExamSignature,
+    headExamSignatureEnabled: settings.headExamSignatureEnabled ?? state.schoolSettings.headExamSignatureEnabled,
+    authorizedSignature: settings.authorizedSignature ?? state.schoolSettings.authorizedSignature,
+    authorizedSignatureEnabled: settings.authorizedSignatureEnabled ?? state.schoolSettings.authorizedSignatureEnabled,
+    authorizedSignatureLabel: settings.authorizedSignatureLabel ?? state.schoolSettings.authorizedSignatureLabel,
+    officialStamp: settings.officialStamp ?? state.schoolSettings.officialStamp,
+    officialStampEnabled: settings.officialStampEnabled ?? state.schoolSettings.officialStampEnabled,
     updatedAt: new Date().toISOString(),
   }
 
